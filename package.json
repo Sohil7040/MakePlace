@@ -1,0 +1,16 @@
+{
+  "name": "makerspace",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev -w @makerspace/api\" \"npm run dev -w @makerspace/web\"",
+    "build": "npm run build -w @makerspace/api && npm run build -w @makerspace/web",
+    "db:migrate": "npm run db:migrate -w @makerspace/api",
+    "db:seed": "npm run db:seed -w @makerspace/api"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

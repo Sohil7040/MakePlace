@@ -1,0 +1,11 @@
+uploads/
+apps/api/uploads/
+node_modules/
+.next/
+dist/
+.env
+.env.local
+*.log
+.DS_Store
+coverage/
+.turbo/

@@ -1,0 +1,165 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  admin
+  mentor
+  student
+}
+
+enum ProjectStatus {
+  draft
+  published
+}
+
+enum MediaType {
+  image
+  video
+  file
+}
+
+enum CommentTargetType {
+  project
+  portfolio
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(student)
+  avatar       String?
+  createdAt    DateTime @default(now())
+
+  student       Student?
+  reports       Report[]  @relation("MentorReports")
+  badgeAwards   BadgeAward[] @relation("AwardedBy")
+  comments      Comment[]
+}
+
+model Student {
+  id        String   @id @default(cuid())
+  userId    String?  @unique
+  fullName  String
+  age       Int
+  contact   String
+  email     String
+  photo     String?
+  programId String
+  studioId  String
+  createdAt DateTime @default(now())
+
+  user        User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  program     Program       @relation(fields: [programId], references: [id])
+  studio      Studio        @relation(fields: [studioId], references: [id])
+  projects    Project[]
+  portfolio   Portfolio?
+  reports     Report[]
+  badgeAwards BadgeAward[]
+}
+
+model Program {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+
+  students Student[]
+}
+
+model Studio {
+  id   String @id @default(cuid())
+  name String
+
+  students Student[]
+}
+
+model Project {
+  id          String        @id @default(cuid())
+  studentId   String
+  title       String
+  description String        @default("")
+  tags        String[]      @default([])
+  status      ProjectStatus @default(draft)
+  publishedAt DateTime?
+  createdAt   DateTime      @default(now())
+
+  student Student        @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  media   ProjectMedia[]
+}
+
+model ProjectMedia {
+  id        String    @id @default(cuid())
+  projectId String
+  type      MediaType
+  url       String
+  caption   String?
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Portfolio {
+  id              String    @id @default(cuid())
+  studentId       String    @unique
+  content         Json?
+  conversation    Json?     @default("[]")
+  publicSlug      String    @unique
+  published       Boolean   @default(false)
+  publishedAt     DateTime?
+  lastGeneratedAt DateTime?
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+
+model Report {
+  id           String   @id @default(cuid())
+  studentId    String
+  mentorId     String
+  content      String
+  weekOf       DateTime
+  sentToParent Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  mentor  User    @relation("MentorReports", fields: [mentorId], references: [id])
+}
+
+model Badge {
+  id          String @id @default(cuid())
+  name        String
+  description String
+  icon        String
+  category    String
+
+  awards BadgeAward[]
+}
+
+model BadgeAward {
+  id         String   @id @default(cuid())
+  studentId  String
+  badgeId    String
+  awardedBy  String
+  awardedAt  DateTime @default(now())
+  note       String?
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  badge   Badge   @relation(fields: [badgeId], references: [id])
+  mentor  User    @relation("AwardedBy", fields: [awardedBy], references: [id])
+}
+
+model Comment {
+  id         String            @id @default(cuid())
+  authorId   String
+  targetType CommentTargetType
+  targetId   String
+  content    String
+  createdAt  DateTime          @default(now())
+
+  author User @relation(fields: [authorId], references: [id])
+}
