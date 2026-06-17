@@ -5,7 +5,7 @@ import { nanoid } from 'nanoid';
 const accountId = process.env.R2_ACCOUNT_ID || '';
 const accessKeyId = process.env.R2_ACCESS_KEY_ID || '';
 const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY || '';
-const bucketName = process.env.R2_BUCKET_NAME || 'makerspace-uploads';
+const bucketName = process.env.R2_BUCKET_NAME || 'makeplace-uploads';
 const publicUrl = process.env.R2_PUBLIC_URL || '';
 
 const s3 = new S3Client({

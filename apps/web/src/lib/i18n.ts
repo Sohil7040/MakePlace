@@ -6,7 +6,7 @@ export const portfolioMessages = {
     highlights: 'Highlights',
     badges: 'Badges Earned',
     viewProject: 'View Details',
-    poweredBy: 'MakerSpace Academy',
+    poweredBy: 'MakePlace Academy',
     language: 'ગુજરાતી',
     noContent: 'Portfolio content coming soon.',
     download: 'Download',

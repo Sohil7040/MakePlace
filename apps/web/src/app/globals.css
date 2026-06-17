@@ -1,49 +1,50 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 222 47% 6%;
-    --foreground: 210 40% 98%;
-    --card: 222 47% 9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 47% 9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 199 89% 48%;
-    --primary-foreground: 222 47% 6%;
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 262 83% 58%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217 33% 20%;
-    --input: 217 33% 20%;
-    --ring: 199 89% 48%;
-    --radius: 0.625rem;
+    /* Dashboard — Obsidian charcoal */
+    --background: 240 6% 7%;
+    --foreground: 40 20% 96%;
+    --card: 240 7% 11%;
+    --card-foreground: 40 20% 96%;
+    --popover: 240 7% 11%;
+    --popover-foreground: 40 20% 96%;
+  /* Vermillion accent */
+    --primary: 16 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 14%;
+    --secondary-foreground: 40 15% 92%;
+    --muted: 240 5% 16%;
+    --muted-foreground: 240 4% 58%;
+    --accent: 15 100% 45%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 5% 18%;
+    --input: 240 5% 18%;
+    --ring: 16 100% 50%;
+    --radius: 0.5rem;
   }
 
-  .light-portfolio {
-    --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-    --primary: 199 89% 40%;
+  /* Parent portal — Architectural cream */
+  .portfolio-theme {
+    --background: 40 43% 97%;
+    --foreground: 240 8% 12%;
+    --card: 40 43% 97%;
+    --card-foreground: 240 8% 12%;
+    --primary: 16 100% 50%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 262 83% 58%;
+    --secondary: 40 33% 93%;
+    --secondary-foreground: 240 8% 12%;
+    --muted: 40 33% 93%;
+    --muted-foreground: 240 5% 40%;
+    --accent: 15 100% 45%;
     --accent-foreground: 0 0% 100%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 199 89% 40%;
+    --border: 40 25% 88%;
+    --input: 40 25% 88%;
+    --ring: 16 100% 50%;
   }
 }
 
@@ -51,27 +52,55 @@
   * {
     @apply border-border;
   }
+
   body {
-    @apply bg-background text-foreground;
-    font-family: 'Inter', sans-serif;
+    @apply bg-background text-foreground font-body antialiased;
   }
-  h1, h2, h3, h4 {
-    font-family: 'Space Grotesk', sans-serif;
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading tracking-tight;
+  }
+}
+
+@layer components {
+  .dashboard-shell {
+    @apply min-h-screen bg-obsidian-deep text-foreground;
+    background-image: theme('backgroundImage.dashboard-radial'), theme('backgroundImage.dashboard-grid');
+    background-size: auto, theme('backgroundSize.grid');
+  }
+
+  .dashboard-panel {
+    @apply rounded-lg border border-border/60 bg-card/90 backdrop-blur-sm shadow-card-elevated;
+  }
+
+  .portfolio-shell {
+    @apply min-h-screen bg-cream text-foreground font-body;
+  }
+
+  .portfolio-panel {
+    @apply rounded-xl border border-cream-offset bg-cream shadow-portfolio-card;
+  }
+
+  .portfolio-panel-offset {
+    @apply rounded-xl border border-cream-offset bg-cream-offset;
   }
 }
 
 @layer utilities {
-  .cosmos-glow {
-    box-shadow: 0 0 20px rgba(56, 189, 248, 0.15), 0 0 60px rgba(139, 92, 246, 0.1);
+  .accent-glow {
+    @apply shadow-accent-glow;
   }
-  .cosmos-gradient {
-    background: linear-gradient(135deg, rgba(56, 189, 248, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+
+  .accent-glow-sm {
+    @apply shadow-accent-glow-sm;
   }
-  .star-bg {
-    background-image: radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.15), transparent),
-      radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.1), transparent),
-      radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.12), transparent),
-      radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.08), transparent);
-    background-size: 200px 200px;
+
+  .text-balance-editorial {
+    text-wrap: balance;
   }
 }

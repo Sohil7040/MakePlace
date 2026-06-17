@@ -1,14 +1,14 @@
 {
-  "name": "makerspace",
+  "name": "makeplace",
   "private": true,
   "workspaces": [
     "apps/*"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev -w @makerspace/api\" \"npm run dev -w @makerspace/web\"",
-    "build": "npm run build -w @makerspace/api && npm run build -w @makerspace/web",
-    "db:migrate": "npm run db:migrate -w @makerspace/api",
-    "db:seed": "npm run db:seed -w @makerspace/api"
+    "dev": "concurrently \"npm run dev -w @makeplace/api\" \"npm run dev -w @makeplace/web\"",
+    "build": "npm run build -w @makeplace/api && npm run build -w @makeplace/web",
+    "db:migrate": "npm run db:migrate -w @makeplace/api",
+    "db:seed": "npm run db:seed -w @makeplace/api"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"

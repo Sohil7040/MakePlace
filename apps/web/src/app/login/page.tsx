@@ -33,14 +33,13 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center star-bg bg-background p-4">
-      <div className="absolute inset-0 cosmos-gradient opacity-50" />
-      <Card className="w-full max-w-md relative cosmos-glow border-primary/20">
+    <div className="dashboard-shell flex items-center justify-center p-4">
+      <Card className="w-full max-w-md relative accent-glow border-primary/25 dashboard-panel">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-primary/20">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-vermillion/15">
             <Rocket className="h-7 w-7 text-primary" />
           </div>
-          <CardTitle className="text-2xl">Welcome to MakerSpace</CardTitle>
+          <CardTitle className="text-2xl font-heading">Welcome to MakePlace</CardTitle>
           <CardDescription>Sign in to your academy portal</CardDescription>
         </CardHeader>
         <CardContent>
@@ -50,7 +49,7 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="you@makerspace.in"
+                placeholder="you@makeplace.in"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -71,7 +70,7 @@ export default function LoginPage() {
             </Button>
           </form>
           <p className="mt-4 text-center text-xs text-muted-foreground">
-            Demo: admin@makerspace.in / password123
+            Demo: admin@makeplace.in / password123
           </p>
         </CardContent>
       </Card>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Loader2 } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,13 +10,14 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/components/ui/toaster';
-import { studentsApi, programsApi, studiosApi, uploadApi, type Program, type Studio } from '@/lib/api';
+import { studentsApi, programsApi, studiosApi, mentorApi, uploadApi, type Program, type Studio, type User } from '@/lib/api';
 
 export default function NewStudentPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [programs, setPrograms] = useState<Program[]>([]);
   const [studios, setStudios] = useState<Studio[]>([]);
+  const [mentors, setMentors] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [form, setForm] = useState({
@@ -25,12 +27,14 @@ export default function NewStudentPage() {
     email: '',
     programId: '',
     studioId: '',
+    mentorId: 'unassigned',
   });
 
   useEffect(() => {
-    Promise.all([programsApi.list(), studiosApi.list()]).then(([p, s]) => {
+    Promise.all([programsApi.list(), studiosApi.list(), mentorApi.listMentors()]).then(([p, s, m]) => {
       setPrograms(p.programs);
       setStudios(s.studios);
+      setMentors(m.mentors);
     });
   }, []);
 
@@ -50,6 +54,7 @@ export default function NewStudentPage() {
         email: form.email,
         programId: form.programId,
         studioId: form.studioId,
+        mentorId: form.mentorId === 'unassigned' ? undefined : form.mentorId,
         photo,
       });
 
@@ -143,6 +148,22 @@ export default function NewStudentPage() {
                 </Select>
               </div>
               <div className="space-y-2 sm:col-span-2">
+                <Label>Assigned Mentor</Label>
+                <Select value={form.mentorId} onValueChange={(v) => setForm({ ...form, mentorId: v })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select mentor (optional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="unassigned">Unassigned</SelectItem>
+                    {mentors.map((m) => (
+                      <SelectItem key={m.id} value={m.id}>
+                        {m.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="photo">Photo (optional)</Label>
                 <Input
                   id="photo"
@@ -154,9 +175,10 @@ export default function NewStudentPage() {
             </div>
             <div className="flex gap-3 pt-4">
               <Button type="submit" disabled={loading}>
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {loading ? 'Creating...' : 'Create Student'}
               </Button>
-              <Button type="button" variant="outline" onClick={() => router.back()}>
+              <Button type="button" variant="outline" onClick={() => router.back()} disabled={loading}>
                 Cancel
               </Button>
             </div>

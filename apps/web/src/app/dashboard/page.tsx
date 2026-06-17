@@ -32,8 +32,8 @@ export default function DashboardPage() {
     <DashboardLayout>
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl font-bold">Hello, {user?.name?.split(' ')[0]} 👋</h1>
-          <p className="text-muted-foreground mt-1">Welcome back to your MakerSpace dashboard</p>
+          <h1 className="text-3xl font-heading font-bold">Hello, {user?.name?.split(' ')[0]} 👋</h1>
+          <p className="text-muted-foreground mt-1 font-body">Welcome back to your MakePlace dashboard</p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -41,7 +41,7 @@ export default function DashboardPage() {
             const Icon = item.icon;
             return (
               <Link key={item.href} href={item.href}>
-                <Card className="hover:border-primary/50 transition-colors cosmos-glow cursor-pointer h-full">
+                <Card className="hover:border-primary/40 transition-colors accent-glow-sm cursor-pointer h-full dashboard-panel">
                   <CardHeader className="flex flex-row items-center gap-4">
                     <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/15">
                       <Icon className="h-6 w-6 text-primary" />

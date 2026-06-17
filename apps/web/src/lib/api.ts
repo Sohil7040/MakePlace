@@ -20,6 +20,7 @@ export interface Student {
   photo?: string | null;
   programId: string;
   studioId: string;
+  mentorId?: string | null;
   createdAt: string;
   program?: { id: string; name: string; description?: string };
   studio?: { id: string; name: string };
@@ -215,7 +216,7 @@ export const portfolioApi = {
   getPublic: (slug: string) => api<{ portfolio: Portfolio }>(`/api/portfolio/public/${slug}`),
   get: (studentId: string) => api<{ portfolio: Portfolio }>(`/api/students/${studentId}/portfolio`),
   generate: (studentId: string) =>
-    api<{ portfolio: Portfolio }>(`/api/students/${studentId}/portfolio/generate`, { method: 'POST' }),
+    api<{ portfolio: Portfolio }>(`/api/students/${studentId}/portfolio/generate`, { method: 'POST', body: JSON.stringify({}) }),
   chat: (studentId: string, message: string) =>
     api<{ portfolio: Portfolio }>(`/api/students/${studentId}/portfolio/chat`, {
       method: 'POST',
@@ -229,6 +230,10 @@ export const portfolioApi = {
 };
 
 export const mentorApi = {
+  listMentors: () => api<{ mentors: User[] }>('/api/mentors'),
+  createMentor: (data: { name: string; email: string }) =>
+    api<{ mentor: User }>('/api/mentors', { method: 'POST', body: JSON.stringify(data) }),
+  deleteMentor: (id: string) => api<void>(`/api/mentors/${id}`, { method: 'DELETE', body: JSON.stringify({}) }),
   getReports: (studentId: string) => api<{ reports: Report[] }>(`/api/students/${studentId}/reports`),
   createReport: (studentId: string, data: { content: string; weekOf: string; sentToParent?: boolean }) =>
     api<{ report: Report }>(`/api/students/${studentId}/reports`, {

@@ -1,10 +1,66 @@
+import { z } from 'zod';
+import bcrypt from 'bcryptjs';
+import { nanoid } from 'nanoid';
 import type { FastifyInstance } from 'fastify';
 import { prisma } from '../lib/prisma.js';
 import { reportCreateSchema, badgeAwardSchema, commentCreateSchema } from '../lib/schemas.js';
-import { mentorOrAdmin, anyAuthenticated } from '../lib/auth.js';
+import { adminOnly, mentorOrAdmin, anyAuthenticated } from '../lib/auth.js';
 import { fireWebhook } from '../lib/webhooks.js';
+import { sendPlatformCredentials } from '../lib/mailer.js';
 
 export async function mentorRoutes(app: FastifyInstance) {
+  app.get('/api/mentors', { preHandler: adminOnly }, async () => {
+    const mentors = await prisma.user.findMany({
+      where: { role: 'mentor' },
+      select: { id: true, name: true, email: true, avatar: true },
+      orderBy: { name: 'asc' },
+    });
+    return { mentors };
+  });
+
+  app.post('/api/mentors', { preHandler: adminOnly }, async (request, reply) => {
+    const body = z.object({ name: z.string().min(2), email: z.string().email() }).parse(request.body);
+    
+    const existing = await prisma.user.findUnique({ where: { email: body.email } });
+    if (existing) return reply.status(409).send({ error: 'User with this email already exists' });
+
+    const plainPassword = nanoid(10);
+    const passwordHash = await bcrypt.hash(plainPassword, 10);
+
+    const mentor = await prisma.user.create({
+      data: {
+        name: body.name,
+        email: body.email,
+        passwordHash,
+        role: 'mentor',
+      },
+      select: { id: true, name: true, email: true, role: true, createdAt: true },
+    });
+
+    await sendPlatformCredentials(body.email, body.name, plainPassword);
+
+    return reply.status(201).send({ mentor });
+  });
+
+  app.delete('/api/mentors/:id', { preHandler: adminOnly }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+
+    const mentor = await prisma.user.findUnique({ where: { id } });
+    if (!mentor || mentor.role !== 'mentor') {
+      return reply.status(404).send({ error: 'Mentor not found' });
+    }
+
+    // Unassign mentor from any students before deleting
+    await prisma.student.updateMany({
+      where: { mentorId: id },
+      data: { mentorId: null },
+    });
+
+    await prisma.user.delete({ where: { id } });
+
+    return reply.status(204).send();
+  });
+
   app.get('/api/students/:studentId/reports', { preHandler: mentorOrAdmin }, async (request) => {
     const { studentId } = request.params as { studentId: string };
     const reports = await prisma.report.findMany({

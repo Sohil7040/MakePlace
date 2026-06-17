@@ -39,6 +39,7 @@ model User {
   createdAt    DateTime @default(now())
 
   student       Student?
+  assignedStudents Student[] @relation("AssignedStudents")
   reports       Report[]  @relation("MentorReports")
   badgeAwards   BadgeAward[] @relation("AwardedBy")
   comments      Comment[]
@@ -54,9 +55,11 @@ model Student {
   photo     String?
   programId String
   studioId  String
+  mentorId  String?
   createdAt DateTime @default(now())
 
   user        User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  mentor      User?         @relation("AssignedStudents", fields: [mentorId], references: [id])
   program     Program       @relation(fields: [programId], references: [id])
   studio      Studio        @relation(fields: [studioId], references: [id])
   projects    Project[]

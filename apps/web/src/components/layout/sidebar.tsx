@@ -22,6 +22,7 @@ const navItems = {
   admin: [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/dashboard/students', label: 'Students', icon: Users },
+    { href: '/dashboard/mentors', label: 'Mentors', icon: FileText },
     { href: '/dashboard/projects', label: 'Projects', icon: FolderKanban },
     { href: '/dashboard/badges', label: 'Badges', icon: Award },
   ],
@@ -50,11 +51,11 @@ export function Sidebar() {
   const NavContent = () => (
     <>
       <div className="flex items-center gap-3 px-4 py-6 border-b border-border/50">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/20 cosmos-glow">
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-vermillion/15 accent-glow-sm">
           <Rocket className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <h1 className="font-bold text-lg leading-tight">MakerSpace</h1>
+          <h1 className="font-heading font-bold text-lg leading-tight">MakePlace</h1>
           <p className="text-xs text-muted-foreground capitalize">{user.role} portal</p>
         </div>
       </div>
@@ -71,7 +72,7 @@ export function Sidebar() {
               className={cn(
                 'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                 active
-                  ? 'bg-primary/15 text-primary cosmos-glow'
+                  ? 'bg-vermillion/12 text-primary accent-glow-sm'
                   : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
               )}
             >
@@ -112,7 +113,7 @@ export function Sidebar() {
 
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-border/50 bg-card/95 backdrop-blur star-bg transition-transform lg:translate-x-0',
+          'fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-border/50 bg-obsidian-surface/95 backdrop-blur transition-transform lg:translate-x-0',
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >

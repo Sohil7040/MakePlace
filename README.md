@@ -1,6 +1,6 @@
-# MakerSpace
+# MakePlace
 
-Full-stack student portfolio and management platform for STEM/Robotics makerspace academies in India.
+Full-stack student portfolio and management platform for STEM/Robotics makeplace academies in India.
 
 ## Tech Stack
 
@@ -49,9 +49,9 @@ npm run dev
 
 | Role    | Email                  | Password    |
 |---------|------------------------|-------------|
-| Admin   | admin@makerspace.in    | password123 |
-| Mentor  | mentor@makerspace.in   | password123 |
-| Student | student@makerspace.in  | password123 |
+| Admin   | admin@makeplace.in    | password123 |
+| Mentor  | mentor@makeplace.in   | password123 |
+| Student | student@makeplace.in  | password123 |
 
 ### Docker (full stack)
 
@@ -94,7 +94,7 @@ Access via http://localhost (Nginx reverse proxy).
 ## Project Structure
 
 ```
-makerspace/
+makeplace/
 ├── apps/
 │   ├── api/          # Fastify backend
 │   └── web/          # Next.js frontend

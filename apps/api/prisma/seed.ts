@@ -7,33 +7,33 @@ async function main() {
   const passwordHash = await bcrypt.hash('password123', 10);
 
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@makerspace.in' },
+    where: { email: 'admin@makeplace.in' },
     update: {},
     create: {
       name: 'Admin User',
-      email: 'admin@makerspace.in',
+      email: 'admin@makeplace.in',
       passwordHash,
       role: 'admin',
     },
   });
 
   const mentor = await prisma.user.upsert({
-    where: { email: 'mentor@makerspace.in' },
+    where: { email: 'mentor@makeplace.in' },
     update: {},
     create: {
       name: 'Priya Sharma',
-      email: 'mentor@makerspace.in',
+      email: 'mentor@makeplace.in',
       passwordHash,
       role: 'mentor',
     },
   });
 
   const studentUser = await prisma.user.upsert({
-    where: { email: 'student@makerspace.in' },
+    where: { email: 'student@makeplace.in' },
     update: {},
     create: {
       name: 'Arjun Patel',
-      email: 'student@makerspace.in',
+      email: 'student@makeplace.in',
       passwordHash,
       role: 'student',
     },
@@ -79,7 +79,7 @@ async function main() {
       fullName: 'Arjun Patel',
       age: 12,
       contact: '+91 98765 43210',
-      email: 'student@makerspace.in',
+      email: 'student@makeplace.in',
       programId: program.id,
       studioId: studio1.id,
     },

@@ -164,9 +164,11 @@ export default function PortfolioPage() {
                   <div key={i} className="border-l-2 border-primary/30 pl-4">
                     <h3 className="font-semibold">{p.title}</h3>
                     <p className="text-sm text-muted-foreground mt-1">{p.description}</p>
-                    <ul className="mt-2 text-sm list-disc list-inside">
-                      {p.highlights.map((h, j) => <li key={j}>{h}</li>)}
-                    </ul>
+                    {p.highlights && p.highlights.length > 0 && (
+                      <ul className="mt-2 text-sm list-disc list-inside">
+                        {p.highlights.map((h: string, j: number) => <li key={j}>{h}</li>)}
+                      </ul>
+                    )}
                   </div>
                 ))}
               </CardContent>

@@ -1,13 +1,15 @@
 import type { FastifyInstance } from 'fastify';
 import { nanoid } from 'nanoid';
+import bcrypt from 'bcryptjs';
 import { prisma } from '../lib/prisma.js';
 import { studentCreateSchema, studentUpdateSchema } from '../lib/schemas.js';
 import { adminOnly, mentorOrAdmin, anyAuthenticated } from '../lib/auth.js';
+import { sendPlatformCredentials } from '../lib/mailer.js';
 
 export async function studentRoutes(app: FastifyInstance) {
   app.get('/api/students', { preHandler: mentorOrAdmin }, async () => {
     const students = await prisma.student.findMany({
-      include: { program: true, studio: true, user: { select: { id: true, email: true } } },
+      include: { program: true, studio: true, user: { select: { id: true, email: true } }, mentor: { select: { id: true, name: true } } },
       orderBy: { createdAt: 'desc' },
     });
     return { students };
@@ -48,15 +50,40 @@ export async function studentRoutes(app: FastifyInstance) {
     const body = studentCreateSchema.parse(request.body);
     const slug = body.fullName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
+    const existingUser = await prisma.user.findUnique({ where: { email: body.email } });
+    if (existingUser) return reply.status(409).send({ error: 'User with this email already exists' });
+
+    const plainPassword = nanoid(10);
+    const passwordHash = await bcrypt.hash(plainPassword, 10);
+
+    const user = await prisma.user.create({
+      data: {
+        name: body.fullName,
+        email: body.email,
+        passwordHash,
+        role: 'student',
+      },
+    });
+
     const student = await prisma.student.create({
       data: {
-        ...body,
+        fullName: body.fullName,
+        age: body.age,
+        contact: body.contact,
+        email: body.email,
+        photo: body.photo,
+        programId: body.programId,
+        studioId: body.studioId,
+        mentorId: body.mentorId,
+        userId: user.id,
         portfolio: {
           create: { publicSlug: `${slug}-${nanoid(6)}` },
         },
       },
-      include: { program: true, studio: true, portfolio: true },
+      include: { program: true, studio: true, portfolio: true, mentor: { select: { id: true, name: true } } },
     });
+
+    await sendPlatformCredentials(body.email, body.fullName, plainPassword);
 
     return reply.status(201).send({ student });
   });
@@ -75,7 +102,7 @@ export async function studentRoutes(app: FastifyInstance) {
     const student = await prisma.student.update({
       where: { id },
       data: body,
-      include: { program: true, studio: true, portfolio: true },
+      include: { program: true, studio: true, portfolio: true, mentor: { select: { id: true, name: true } } },
     });
     return { student };
   });

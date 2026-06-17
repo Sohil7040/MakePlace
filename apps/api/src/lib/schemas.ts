@@ -21,6 +21,7 @@ export const studentCreateSchema = z.object({
   programId: z.string(),
   studioId: z.string(),
   userId: z.string().optional(),
+  mentorId: z.string().optional(),
 });
 
 export const studentUpdateSchema = studentCreateSchema.partial();
