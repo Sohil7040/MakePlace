@@ -1,16 +1,8 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.example.com',
-  port: parseInt(process.env.SMTP_PORT || '587'),
-  secure: process.env.SMTP_SECURE === 'true',
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-const isSmtpConfigured = Boolean(process.env.SMTP_USER && process.env.SMTP_PASS);
+const isResendConfigured = Boolean(process.env.RESEND_API_KEY);
 
 export async function sendPlatformCredentials(email: string, name: string, plainPassword: string) {
   const loginUrl = process.env.FRONTEND_URL || 'http://localhost:3000/login';
@@ -28,25 +20,29 @@ export async function sendPlatformCredentials(email: string, name: string, plain
     </div>
   `;
 
-  if (!isSmtpConfigured) {
-    console.warn('SMTP is not configured. Email to ' + email + ' was not sent.');
+  if (!isResendConfigured) {
+    console.warn('Resend is not configured. Email to ' + email + ' was not sent.');
     return;
   }
 
   try {
-    await transporter.sendMail({
-      from: process.env.SMTP_FROM || '"MakePlace" <noreply@makeplace.com>',
+    const { error } = await resend.emails.send({
+      from: process.env.EMAIL_FROM || 'MakePlace <onboarding@resend.dev>',
       to: email,
       subject: 'Your MakePlace Platform Credentials',
       html: htmlContent,
     });
+    
+    if (error) {
+      console.error('Failed to send email:', error);
+    }
   } catch (error) {
     console.error('Failed to send email:', error);
   }
 }
 
 export async function sendFeeReceipt(email: string, name: string, amount: number, description: string) {
-  const html = `
+  const htmlContent = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
       <div style="background-color: #10b981; padding: 24px; text-align: center;">
         <h1 style="color: white; margin: 0; font-size: 24px;">Payment Receipt</h1>
@@ -70,19 +66,24 @@ export async function sendFeeReceipt(email: string, name: string, amount: number
     </div>
   `;
 
-  if (!isSmtpConfigured) {
-    console.warn('SMTP is not configured. Receipt to ' + email + ' was not sent.');
+  if (!isResendConfigured) {
+    console.warn('Resend is not configured. Receipt to ' + email + ' was not sent.');
     return;
   }
 
   try {
-    await transporter.sendMail({
-      from: process.env.SMTP_FROM || '"MakePlace" <noreply@makeplace.com>',
+    const { error } = await resend.emails.send({
+      from: process.env.EMAIL_FROM || 'MakePlace <onboarding@resend.dev>',
       to: email,
       subject: 'MakePlace Payment Receipt',
-      html,
+      html: htmlContent,
     });
-    console.log(`Successfully sent receipt to ${email}`);
+    
+    if (error) {
+      console.error('Failed to send receipt email:', error);
+    } else {
+      console.log(`Successfully sent receipt to ${email}`);
+    }
   } catch (err) {
     console.error('Failed to send receipt email:', err);
   }
