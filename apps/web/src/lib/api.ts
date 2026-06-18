@@ -27,6 +27,7 @@ export interface Student {
   portfolio?: Portfolio;
   projects?: Project[];
   badgeAwards?: BadgeAward[];
+  mentor?: { name: string };
 }
 
 export interface Program {
