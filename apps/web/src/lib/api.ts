@@ -286,6 +286,24 @@ export const uploadApi = {
       body: JSON.stringify({ filename, contentType, folder }),
     }),
   uploadFile: async (file: File, folder?: string) => {
+    const MAX_SIZE = 50 * 1024 * 1024; // 50MB
+    if (file.size > MAX_SIZE) {
+      throw new ApiError(400, 'File size exceeds the 50MB limit');
+    }
+
+    const { mode } = await uploadApi.getMode();
+
+    if (mode === 'r2') {
+      const { uploadUrl, publicUrl } = await uploadApi.presign(file.name, file.type, folder);
+      const s3Res = await fetch(uploadUrl, {
+        method: 'PUT',
+        body: file,
+        headers: { 'Content-Type': file.type },
+      });
+      if (!s3Res.ok) throw new ApiError(s3Res.status, 'Cloud upload failed');
+      return publicUrl;
+    }
+
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     const formData = new FormData();
     formData.append('file', file);
