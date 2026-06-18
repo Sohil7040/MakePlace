@@ -120,6 +120,21 @@ export async function mentorRoutes(app: FastifyInstance) {
     return { badges };
   });
 
+  app.post('/api/badges', { preHandler: mentorOrAdmin }, async (request, reply) => {
+    const body = badgeCreateSchema.parse(request.body);
+
+    const badge = await prisma.badge.create({
+      data: {
+        name: body.name,
+        description: body.description,
+        icon: body.icon,
+        category: body.category,
+      },
+    });
+
+    return reply.status(201).send({ badge });
+  });
+
   app.post('/api/students/:studentId/badges', { preHandler: mentorOrAdmin }, async (request, reply) => {
     const { studentId } = request.params as { studentId: string };
     const body = badgeAwardSchema.parse(request.body);

@@ -12,6 +12,8 @@ import {
   Rocket,
   Menu,
   X,
+  CreditCard,
+  Settings,
 } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '@/contexts/auth-context';
@@ -25,6 +27,7 @@ const navItems = {
     { href: '/dashboard/mentors', label: 'Mentors', icon: FileText },
     { href: '/dashboard/projects', label: 'Projects', icon: FolderKanban },
     { href: '/dashboard/badges', label: 'Badges', icon: Award },
+    { href: '/dashboard/fees', label: 'Fees & Payments', icon: CreditCard },
   ],
   mentor: [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -63,7 +66,9 @@ export function Sidebar() {
       <nav className="flex-1 px-3 py-4 space-y-1">
         {items.map((item) => {
           const Icon = item.icon;
-          const active = pathname === item.href || pathname.startsWith(item.href + '/');
+          const active = item.href === '/dashboard' 
+            ? pathname === '/dashboard'
+            : pathname === item.href || pathname.startsWith(item.href + '/');
           return (
             <Link
               key={item.href}
@@ -88,7 +93,13 @@ export function Sidebar() {
           <p className="text-sm font-medium truncate">{user.name}</p>
           <p className="text-xs text-muted-foreground truncate">{user.email}</p>
         </div>
-        <Button variant="ghost" size="sm" className="w-full justify-start gap-2" onClick={logout}>
+        <Link href="/dashboard/settings" onClick={() => setMobileOpen(false)}>
+          <Button variant="ghost" size="sm" className="w-full justify-start gap-2 text-muted-foreground">
+            <Settings className="h-4 w-4" />
+            Settings
+          </Button>
+        </Link>
+        <Button variant="ghost" size="sm" className="w-full justify-start gap-2 mt-1" onClick={logout}>
           <LogOut className="h-4 w-4" />
           Sign out
         </Button>

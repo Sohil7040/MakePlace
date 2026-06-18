@@ -30,7 +30,8 @@ export default function PortfolioPage() {
   useEffect(() => {
     async function load() {
       try {
-        let sid = authStudent?.id;
+        const urlParams = new URLSearchParams(window.location.search);
+        let sid = urlParams.get('studentId') || authStudent?.id;
         if (!sid && user?.role === 'student') {
           const { student } = await studentsApi.me();
           sid = student.id;

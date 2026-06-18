@@ -102,7 +102,7 @@ export default function PublicPortfolioPage() {
                       )}
                       <h3 className="text-xl font-heading font-semibold">{project.title}</h3>
                       <p className="text-muted-foreground mt-2">{project.description}</p>
-                      {project.highlights.length > 0 && (
+                      {project.highlights && project.highlights.length > 0 && (
                         <ul className="mt-3 space-y-1 text-sm">
                           {project.highlights.map((h, j) => (
                             <li key={j} className="flex items-start gap-2">

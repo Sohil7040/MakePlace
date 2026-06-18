@@ -12,6 +12,11 @@ export const registerSchema = z.object({
   role: z.enum(['admin', 'mentor', 'student']).optional(),
 });
 
+export const passwordChangeSchema = z.object({
+  currentPassword: z.string().min(1),
+  newPassword: z.string().min(6),
+});
+
 export const studentCreateSchema = z.object({
   fullName: z.string().min(2),
   age: z.number().int().min(5).max(25),
@@ -62,6 +67,20 @@ export const commentCreateSchema = z.object({
   targetType: z.enum(['project', 'portfolio']),
   targetId: z.string(),
   content: z.string().min(1),
+});
+
+export const badgeCreateSchema = z.object({
+  name: z.string().min(2),
+  description: z.string().min(2),
+  icon: z.string().min(1),
+  category: z.string().min(2),
+});
+
+export const feeCreateSchema = z.object({
+  studentId: z.string(),
+  amount: z.number().min(0),
+  description: z.string().min(2),
+  dueDate: z.string().datetime(),
 });
 
 export const portfolioChatSchema = z.object({

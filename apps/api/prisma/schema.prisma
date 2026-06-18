@@ -18,6 +18,12 @@ enum ProjectStatus {
   published
 }
 
+enum FeeStatus {
+  pending
+  paid
+  overdue
+}
+
 enum MediaType {
   image
   video
@@ -66,6 +72,7 @@ model Student {
   portfolio   Portfolio?
   reports     Report[]
   badgeAwards BadgeAward[]
+  fees        Fee[]
 }
 
 model Program {
@@ -165,4 +172,17 @@ model Comment {
   createdAt  DateTime          @default(now())
 
   author User @relation(fields: [authorId], references: [id])
+}
+
+model Fee {
+  id          String    @id @default(cuid())
+  studentId   String
+  amount      Float
+  description String
+  dueDate     DateTime
+  status      FeeStatus @default(pending)
+  paidAt      DateTime?
+  createdAt   DateTime  @default(now())
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 }

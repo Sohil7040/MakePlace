@@ -109,6 +109,18 @@ export interface BadgeAward {
   mentor?: { name: string };
 }
 
+export interface Fee {
+  id: string;
+  studentId: string;
+  amount: number;
+  description: string;
+  dueDate: string;
+  status: 'pending' | 'paid' | 'overdue';
+  paidAt?: string | null;
+  createdAt: string;
+  student?: { fullName: string; email: string; program?: { name: string } };
+}
+
 export interface Comment {
   id: string;
   authorId: string;
@@ -169,6 +181,8 @@ export const authApi = {
       body: JSON.stringify(data),
     }),
   me: () => api<{ user: User & { student?: Student } }>('/api/auth/me'),
+  updatePassword: (data: { currentPassword: string; newPassword: string }) =>
+    api<{ success: boolean }>('/api/auth/password', { method: 'PATCH', body: JSON.stringify(data) }),
 };
 
 export const studentsApi = {
@@ -252,6 +266,16 @@ export const mentorApi = {
     api<{ comments: Comment[] }>(`/api/comments?targetType=${targetType}&targetId=${targetId}`),
   createComment: (data: { targetType: string; targetId: string; content: string }) =>
     api<{ comment: Comment }>('/api/comments', { method: 'POST', body: JSON.stringify(data) }),
+  createBadge: (data: { name: string; description: string; icon: string; category: string }) =>
+    api<{ badge: Badge }>('/api/badges', { method: 'POST', body: JSON.stringify(data) }),
+};
+
+export const feesApi = {
+  list: () => api<{ fees: Fee[] }>('/api/fees'),
+  create: (data: { studentId: string; amount: number; description: string; dueDate: string }) =>
+    api<{ fee: Fee }>('/api/fees', { method: 'POST', body: JSON.stringify(data) }),
+  updateStatus: (id: string, status: 'pending' | 'paid' | 'overdue') =>
+    api<{ fee: Fee }>(`/api/fees/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
 };
 
 export const uploadApi = {

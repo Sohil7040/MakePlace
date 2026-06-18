@@ -1,7 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import bcrypt from 'bcryptjs';
 import { prisma } from '../lib/prisma.js';
-import { loginSchema, registerSchema } from '../lib/schemas.js';
+import { loginSchema, registerSchema, passwordChangeSchema } from '../lib/schemas.js';
 import { anyAuthenticated } from '../lib/auth.js';
 
 export async function authRoutes(app: FastifyInstance) {
@@ -48,5 +48,22 @@ export async function authRoutes(app: FastifyInstance) {
       select: { id: true, name: true, email: true, role: true, avatar: true, student: true },
     });
     return { user };
+  });
+
+  app.patch('/api/auth/password', { preHandler: anyAuthenticated }, async (request, reply) => {
+    const body = passwordChangeSchema.parse(request.body);
+    const user = await prisma.user.findUnique({ where: { id: request.user.id } });
+    if (!user) return reply.status(404).send({ error: 'User not found' });
+
+    const valid = await bcrypt.compare(body.currentPassword, user.passwordHash);
+    if (!valid) return reply.status(401).send({ error: 'Current password is incorrect' });
+
+    const passwordHash = await bcrypt.hash(body.newPassword, 10);
+    await prisma.user.update({
+      where: { id: request.user.id },
+      data: { passwordHash },
+    });
+
+    return { success: true };
   });
 }

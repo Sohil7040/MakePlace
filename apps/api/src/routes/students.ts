@@ -34,6 +34,7 @@ export async function studentRoutes(app: FastifyInstance) {
         portfolio: true,
         badgeAwards: { include: { badge: true, mentor: { select: { name: true } } } },
         projects: { include: { media: true } },
+        mentor: { select: { id: true, name: true } },
       },
     });
     if (!student) return reply.status(404).send({ error: 'Student not found' });

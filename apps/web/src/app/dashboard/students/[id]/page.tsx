@@ -23,6 +23,7 @@ import {
   type Program,
   type Studio,
   type Badge,
+  type User,
 } from '@/lib/api';
 
 export default function StudentProfilePage() {
@@ -34,6 +35,7 @@ export default function StudentProfilePage() {
   const [programs, setPrograms] = useState<Program[]>([]);
   const [studios, setStudios] = useState<Studio[]>([]);
   const [badges, setBadges] = useState<Badge[]>([]);
+  const [mentors, setMentors] = useState<User[]>([]);
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -47,6 +49,7 @@ export default function StudentProfilePage() {
     email: '',
     programId: '',
     studioId: '',
+    mentorId: 'none',
   });
 
   const canEdit = user?.role === 'admin' || (user?.role === 'student' && student?.userId === user.id);
@@ -58,12 +61,14 @@ export default function StudentProfilePage() {
       programsApi.list(),
       studiosApi.list(),
       isMentor ? mentorApi.getBadges() : Promise.resolve({ badges: [] }),
+      user?.role === 'admin' ? mentorApi.listMentors() : Promise.resolve({ mentors: [] }),
     ])
-      .then(([s, p, st, b]) => {
+      .then(([s, p, st, b, m]) => {
         setStudent(s.student);
         setPrograms(p.programs);
         setStudios(st.studios);
         setBadges(b.badges);
+        setMentors(m.mentors);
         setForm({
           fullName: s.student.fullName,
           age: String(s.student.age),
@@ -71,6 +76,7 @@ export default function StudentProfilePage() {
           email: s.student.email,
           programId: s.student.programId,
           studioId: s.student.studioId,
+          mentorId: s.student.mentorId || 'none',
         });
       })
       .catch(() => router.push('/dashboard/students'))
@@ -87,6 +93,7 @@ export default function StudentProfilePage() {
         email: form.email,
         programId: form.programId,
         studioId: form.studioId,
+        mentorId: form.mentorId === 'none' ? null : form.mentorId,
       });
       setStudent(updated);
       setEditing(false);
@@ -225,6 +232,18 @@ export default function StudentProfilePage() {
                         </SelectContent>
                       </Select>
                     </div>
+                    {user?.role === 'admin' && (
+                      <div className="space-y-2">
+                        <Label>Assigned Mentor</Label>
+                        <Select value={form.mentorId} onValueChange={(v) => setForm({ ...form, mentorId: v })}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">Unassigned</SelectItem>
+                            {mentors.map((m) => <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
                   </div>
                   <div className="flex gap-2">
                     <Button onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : 'Save'}</Button>
@@ -238,6 +257,7 @@ export default function StudentProfilePage() {
                   <div><dt className="text-sm text-muted-foreground">Contact</dt><dd>{student.contact}</dd></div>
                   <div><dt className="text-sm text-muted-foreground">Program</dt><dd>{student.program?.name}</dd></div>
                   <div><dt className="text-sm text-muted-foreground">Studio</dt><dd>{student.studio?.name}</dd></div>
+                  <div><dt className="text-sm text-muted-foreground">Mentor</dt><dd>{student.mentor?.name || 'Unassigned'}</dd></div>
                 </dl>
               )}
             </CardContent>
@@ -245,9 +265,14 @@ export default function StudentProfilePage() {
         </div>
 
         {isMentor && (
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
             <Link href={`/dashboard/students/${id}/reports`}>
               <Button variant="outline" className="gap-2"><FileText className="h-4 w-4" /> Weekly Reports</Button>
+            </Link>
+            <Link href={`/dashboard/portfolio?studentId=${id}`}>
+              <Button variant="outline" className="gap-2 border-primary text-primary hover:bg-primary/10">
+                <FileText className="h-4 w-4" /> Manage Portfolio
+              </Button>
             </Link>
             <Button variant="outline" className="gap-2" onClick={() => setShowBadgeModal(true)}>
               <Award className="h-4 w-4" /> Award Badge
