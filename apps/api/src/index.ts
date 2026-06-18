@@ -17,7 +17,11 @@ const app = Fastify({ logger: true });
 
 async function start() {
   await app.register(cors, {
-    origin: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+    origin: [
+      'http://localhost:3000',
+      'https://makeplace.vercel.app',
+      process.env.NEXT_PUBLIC_APP_URL || ''
+    ].filter(Boolean),
     credentials: true,
   });
 
