@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import { nanoid } from 'nanoid';
 import type { FastifyInstance } from 'fastify';
 import { prisma } from '../lib/prisma.js';
-import { reportCreateSchema, badgeAwardSchema, commentCreateSchema } from '../lib/schemas.js';
+import { reportCreateSchema, badgeAwardSchema, commentCreateSchema, badgeCreateSchema } from '../lib/schemas.js';
 import { adminOnly, mentorOrAdmin, anyAuthenticated } from '../lib/auth.js';
 import { fireWebhook } from '../lib/webhooks.js';
 import { sendPlatformCredentials } from '../lib/mailer.js';

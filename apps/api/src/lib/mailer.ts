@@ -29,11 +29,7 @@ export async function sendPlatformCredentials(email: string, name: string, plain
   `;
 
   if (!isSmtpConfigured) {
-    console.log('\n--- MOCK EMAIL DISPATCH ---');
-    console.log(`To: ${email}`);
-    console.log(`Subject: Your MakePlace Platform Credentials`);
-    console.log(`Password: ${plainPassword}`);
-    console.log('---------------------------\n');
+    console.warn('SMTP is not configured. Email to ' + email + ' was not sent.');
     return;
   }
 
@@ -75,10 +71,7 @@ export async function sendFeeReceipt(email: string, name: string, amount: number
   `;
 
   if (!isSmtpConfigured) {
-    console.log('\n--- MOCK FEE RECEIPT ---');
-    console.log(`To: ${email}`);
-    console.log(`Amount: ₹${amount}`);
-    console.log('---------------------------\n');
+    console.warn('SMTP is not configured. Receipt to ' + email + ' was not sent.');
     return;
   }
 

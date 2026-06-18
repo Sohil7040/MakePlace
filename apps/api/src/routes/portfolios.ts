@@ -51,6 +51,7 @@ export async function portfolioRoutes(app: FastifyInstance) {
         program: true,
         projects: { include: { media: true } },
         badgeAwards: { include: { badge: true } },
+        mentor: true,
       },
     });
     if (!student) return reply.status(404).send({ error: 'Student not found' });
@@ -60,7 +61,12 @@ export async function portfolioRoutes(app: FastifyInstance) {
       if (own?.id !== studentId) return reply.status(403).send({ error: 'Forbidden' });
     }
 
-    const content = await generatePortfolio({ student, projects: student.projects, badges: student.badgeAwards });
+    const content = await generatePortfolio({ 
+      student, 
+      projects: student.projects, 
+      badges: student.badgeAwards,
+      mentorName: student.mentor?.name || 'Assigned Mentor'
+    });
 
     const portfolio = await prisma.portfolio.update({
       where: { studentId },

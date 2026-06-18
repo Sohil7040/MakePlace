@@ -69,9 +69,7 @@ export default function LoginPage() {
               {loading ? 'Signing in...' : 'Sign in'}
             </Button>
           </form>
-          <p className="mt-4 text-center text-xs text-muted-foreground">
-            Demo: admin@makeplace.in / password123
-          </p>
+
         </CardContent>
       </Card>
     </div>
