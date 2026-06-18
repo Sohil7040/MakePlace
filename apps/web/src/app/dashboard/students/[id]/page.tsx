@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Award, FileText, Pencil, User } from 'lucide-react';
+import { ArrowLeft, Award, FileText, Pencil, User as UserIcon } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -162,7 +162,7 @@ export default function StudentProfilePage() {
                 <img src={student.photo} alt="" className="mx-auto h-32 w-32 rounded-full object-cover" />
               ) : (
                 <div className="mx-auto flex h-32 w-32 items-center justify-center rounded-full bg-primary/15">
-                  <User className="h-16 w-16 text-primary" />
+                  <UserIcon className="h-16 w-16 text-primary" />
                 </div>
               )}
               {canEdit && (
