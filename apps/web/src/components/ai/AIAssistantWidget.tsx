@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, X, Send, Bot, Minimize2 } from 'lucide-react';
+import { Sparkles, X, Send, Minimize2 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 interface Message {

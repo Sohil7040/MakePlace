@@ -130,7 +130,7 @@ function ProjectCard({ project, onSpark }: { project: ExploredProject, onSpark: 
           <img 
             src={thumbnail} 
             alt={project.title} 
-            className="w-full h-auto object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-105"
+            className="w-full h-auto object-cover transition-transform duration-[1500ms] ease-out group-hover:scale-105"
             loading="lazy"
           />
         ) : (

@@ -22,7 +22,7 @@ import { studentsApi } from '@/lib/api';
 export default function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, student } = useAuth();
   const { toast } = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
   const [project, setProject] = useState<Project | null>(null);
@@ -434,7 +434,7 @@ export default function ProjectDetailPage() {
                     </div>
                     <span className="font-sans font-semibold text-charcoal-900">{c.student?.fullName}</span>
                   </div>
-                  {project.studentId === user?.student?.id && (
+                  {project.studentId === student?.id && (
                     <button onClick={() => handleRemoveCollaborator(c.id)} className="text-red-500 p-1 hover:bg-red-50 rounded">
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -446,7 +446,7 @@ export default function ProjectDetailPage() {
               )}
             </div>
 
-            {project.studentId === user?.student?.id && (
+            {project.studentId === student?.id && (
               <div className="flex gap-2 mb-6">
                 <select 
                   className="flex-1 bg-white border border-charcoal-200 rounded-lg px-3 font-sans text-sm"
