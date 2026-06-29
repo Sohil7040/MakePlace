@@ -7,7 +7,7 @@ import { adminOnly, mentorOrAdmin, anyAuthenticated } from '../lib/auth.js';
 import { sendPlatformCredentials } from '../lib/mailer.js';
 
 export async function studentRoutes(app: FastifyInstance) {
-  app.get('/api/students', { preHandler: mentorOrAdmin }, async () => {
+  app.get('/api/students', { preHandler: anyAuthenticated }, async () => {
     const students = await prisma.student.findMany({
       include: { program: true, studio: true, user: { select: { id: true, email: true } }, mentor: { select: { id: true, name: true } } },
       orderBy: { createdAt: 'desc' },

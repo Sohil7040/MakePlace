@@ -160,6 +160,8 @@ export async function mentorRoutes(app: FastifyInstance) {
     return reply.status(201).send({ award });
   });
 
+
+
   app.get('/api/comments', { preHandler: anyAuthenticated }, async (request) => {
     const { targetType, targetId } = request.query as { targetType?: string; targetId?: string };
     const comments = await prisma.comment.findMany({

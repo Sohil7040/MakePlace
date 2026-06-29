@@ -13,6 +13,81 @@ async function getStudentForUser(userId: string, role: string) {
 }
 
 export async function projectRoutes(app: FastifyInstance) {
+  app.get('/api/projects/:id/collaborators', { preHandler: anyAuthenticated }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const collaborators = await prisma.projectCollaborator.findMany({
+      where: { projectId: id },
+      include: { student: { select: { id: true, fullName: true, photo: true } } }
+    });
+    return { collaborators };
+  });
+
+  app.post('/api/projects/:id/collaborators', { preHandler: anyAuthenticated }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const { studentId } = request.body as { studentId: string };
+    
+    const existing = await prisma.project.findUnique({ where: { id } });
+    if (!existing) return reply.status(404).send({ error: 'Project not found' });
+
+    if (request.user.role === 'student') {
+      const student = await getStudentForUser(request.user.id, request.user.role);
+      if (student?.id !== existing.studentId) return reply.status(403).send({ error: 'Only owner can add collaborators' });
+    }
+
+    const collaborator = await prisma.projectCollaborator.create({
+      data: { projectId: id, studentId },
+      include: { student: { select: { id: true, fullName: true, photo: true } } }
+    });
+
+    return reply.status(201).send({ collaborator });
+  });
+
+  app.delete('/api/projects/:id/collaborators/:collaboratorId', { preHandler: anyAuthenticated }, async (request, reply) => {
+    const { id, collaboratorId } = request.params as { id: string, collaboratorId: string };
+    const existing = await prisma.project.findUnique({ where: { id } });
+    if (!existing) return reply.status(404).send({ error: 'Project not found' });
+
+    if (request.user.role === 'student') {
+      const student = await getStudentForUser(request.user.id, request.user.role);
+      if (student?.id !== existing.studentId) return reply.status(403).send({ error: 'Only owner can remove collaborators' });
+    }
+
+    await prisma.projectCollaborator.delete({ where: { id: collaboratorId } });
+    return reply.status(204).send();
+  });
+
+  app.get('/api/projects/explore', { preHandler: anyAuthenticated }, async (request) => {
+    const projects = await prisma.project.findMany({
+      where: { status: 'published' },
+      include: { 
+        media: true, 
+        student: { select: { id: true, fullName: true, photo: true } },
+        _count: { select: { sparks: true } },
+      },
+      orderBy: { publishedAt: 'desc' },
+    });
+    return { projects };
+  });
+
+  app.post('/api/projects/:id/spark', { preHandler: anyAuthenticated }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const student = await getStudentForUser(request.user.id, request.user.role);
+    
+    if (!student) return reply.status(403).send({ error: 'Only students can give sparks' });
+
+    const existing = await prisma.spark.findUnique({
+      where: { studentId_projectId: { studentId: student.id, projectId: id } }
+    });
+
+    if (existing) {
+      await prisma.spark.delete({ where: { id: existing.id } });
+      return { success: true, sparked: false };
+    } else {
+      await prisma.spark.create({ data: { studentId: student.id, projectId: id } });
+      return { success: true, sparked: true };
+    }
+  });
+
   app.get('/api/projects', { preHandler: anyAuthenticated }, async (request) => {
     if (request.user.role === 'student') {
       const student = await getStudentForUser(request.user.id, request.user.role);
@@ -48,13 +123,16 @@ export async function projectRoutes(app: FastifyInstance) {
       include: {
         media: true,
         student: { select: { id: true, fullName: true, userId: true } },
+        collaborators: { include: { student: { select: { id: true, fullName: true, photo: true } } } }
       },
     });
     if (!project) return reply.status(404).send({ error: 'Project not found' });
 
     if (request.user.role === 'student') {
       const student = await getStudentForUser(request.user.id, request.user.role);
-      if (student?.id !== project.studentId) {
+      const isOwner = student?.id === project.studentId;
+      const isCollab = project.collaborators.some(c => c.studentId === student?.id);
+      if (!isOwner && !isCollab) {
         return reply.status(403).send({ error: 'Forbidden' });
       }
     }
@@ -87,12 +165,17 @@ export async function projectRoutes(app: FastifyInstance) {
     const { id } = request.params as { id: string };
     const body = projectUpdateSchema.parse(request.body);
 
-    const existing = await prisma.project.findUnique({ where: { id } });
+    const existing = await prisma.project.findUnique({ 
+      where: { id },
+      include: { collaborators: true }
+    });
     if (!existing) return reply.status(404).send({ error: 'Project not found' });
 
     if (request.user.role === 'student') {
       const student = await getStudentForUser(request.user.id, request.user.role);
-      if (student?.id !== existing.studentId) return reply.status(403).send({ error: 'Forbidden' });
+      const isOwner = student?.id === existing.studentId;
+      const isCollab = existing.collaborators.some(c => c.studentId === student?.id);
+      if (!isOwner && !isCollab) return reply.status(403).send({ error: 'Forbidden' });
     }
 
     const project = await prisma.project.update({

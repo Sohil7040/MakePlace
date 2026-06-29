@@ -18,6 +18,15 @@ enum ProjectStatus {
   published
 }
 
+enum ProjectPhase {
+  idea
+  research
+  design
+  build
+  testing
+  completed
+}
+
 enum FeeStatus {
   pending
   paid
@@ -62,6 +71,8 @@ model Student {
   programId String
   studioId  String
   mentorId  String?
+  parentPortalSlug String? @unique
+  xp        Int      @default(0)
   createdAt DateTime @default(now())
 
   user        User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
@@ -73,6 +84,9 @@ model Student {
   reports     Report[]
   badgeAwards BadgeAward[]
   fees        Fee[]
+  journals    DesignJournal[]
+  sparks      Spark[]
+  collaborations ProjectCollaborator[]
 }
 
 model Program {
@@ -97,11 +111,29 @@ model Project {
   description String        @default("")
   tags        String[]      @default([])
   status      ProjectStatus @default(draft)
+  phase       ProjectPhase  @default(idea)
   publishedAt DateTime?
   createdAt   DateTime      @default(now())
 
-  student Student        @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  media   ProjectMedia[]
+  student  Student         @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  media    ProjectMedia[]
+  tasks         ProjectTask[]
+  journals      DesignJournal[]
+  sparks        Spark[]
+  collaborators ProjectCollaborator[]
+}
+
+model ProjectCollaborator {
+  id        String   @id @default(cuid())
+  projectId String
+  studentId String
+  role      String   @default("member")
+  createdAt DateTime @default(now())
+
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, studentId])
 }
 
 model ProjectMedia {
@@ -121,6 +153,7 @@ model Portfolio {
   conversation    Json?     @default("[]")
   publicSlug      String    @unique
   published       Boolean   @default(false)
+  theme           String    @default("minimalist")
   publishedAt     DateTime?
   lastGeneratedAt DateTime?
 
@@ -141,13 +174,13 @@ model Report {
 }
 
 model Badge {
-  id          String @id @default(cuid())
-  name        String
-  description String
-  icon        String
-  category    String
+  id             String  @id @default(cuid())
+  name           String
+  description    String
+  icon           String
+  category       String
 
-  awards BadgeAward[]
+  awards       BadgeAward[]
 }
 
 model BadgeAward {
@@ -185,4 +218,40 @@ model Fee {
   createdAt   DateTime  @default(now())
 
   student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+
+model ProjectTask {
+  id          String   @id @default(cuid())
+  projectId   String
+  title       String
+  status      String   @default("todo") // todo, in_progress, done
+  order       Float    @default(0)
+  createdAt   DateTime @default(now())
+
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model DesignJournal {
+  id          String   @id @default(cuid())
+  studentId   String
+  projectId   String?  // Optional for standalone journals
+  title       String   @default("New Journal")
+  canvasData  Json?    
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  project     Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Spark {
+  id        String   @id @default(cuid())
+  studentId String
+  projectId String
+  createdAt DateTime @default(now())
+
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, projectId])
 }

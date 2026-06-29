@@ -11,6 +11,9 @@ import { portfolioRoutes } from './routes/portfolios.js';
 import { mentorRoutes } from './routes/mentor.js';
 import { webhookRoutes } from './routes/webhooks.js';
 import { feesRoutes } from './routes/fees.js';
+import { taskRoutes } from './routes/tasks.js';
+import { journalRoutes } from './routes/journals.js';
+import { aiRoutes } from './routes/ai.js';
 import { prisma } from './lib/prisma.js';
 
 const app = Fastify({ logger: true });
@@ -42,6 +45,9 @@ async function start() {
   await app.register(mentorRoutes);
   await app.register(webhookRoutes);
   await app.register(feesRoutes);
+  await app.register(taskRoutes);
+  await app.register(journalRoutes);
+  await app.register(aiRoutes);
 
   const port = Number(process.env.API_PORT || 3001);
   const host = '0.0.0.0';

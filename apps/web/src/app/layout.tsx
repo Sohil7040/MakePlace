@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Space_Grotesk, Plus_Jakarta_Sans } from 'next/font/google';
 import { AuthProvider } from '@/contexts/auth-context';
 import { Toaster } from '@/components/ui/toaster';
+import NextTopLoader from 'nextjs-toploader';
 import './globals.css';
 
 const spaceGrotesk = Space_Grotesk({
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${spaceGrotesk.variable} ${plusJakarta.variable}`}>
       <body className="font-body">
+        <NextTopLoader color="#1C1C1E" showSpinner={false} shadow="0 0 10px rgba(28,28,30,0.3),0 0 5px rgba(28,28,30,0.2)" />
         <AuthProvider>
           <Toaster>{children}</Toaster>
         </AuthProvider>

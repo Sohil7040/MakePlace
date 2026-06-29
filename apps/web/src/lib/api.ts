@@ -21,6 +21,7 @@ export interface Student {
   programId: string;
   studioId: string;
   mentorId?: string | null;
+  xp: number;
   createdAt: string;
   program?: { id: string; name: string; description?: string };
   studio?: { id: string; name: string };
@@ -28,6 +29,7 @@ export interface Student {
   projects?: Project[];
   badgeAwards?: BadgeAward[];
   mentor?: { name: string };
+  reports?: Report[];
 }
 
 export interface Program {
@@ -48,9 +50,11 @@ export interface Project {
   description: string;
   tags: string[];
   status: 'draft' | 'published';
+  phase?: 'idea' | 'research' | 'design' | 'build' | 'testing' | 'completed';
   publishedAt?: string | null;
   createdAt: string;
   media?: ProjectMedia[];
+  journals?: any[];
   student?: { id: string; fullName: string };
 }
 
@@ -64,7 +68,21 @@ export interface ProjectMedia {
 
 export interface PortfolioContent {
   about: string;
-  projects: Array<{ title: string; description: string; highlights: string[] }>;
+  projects: Array<{ 
+    id?: string;
+    title: string; 
+    description: string; 
+    highlights?: string[];
+    mediaUrls?: string[];
+    story?: {
+      problem: string;
+      idea: string;
+      process: string;
+      challenges: string;
+      solution: string;
+      learning: string;
+    };
+  }>;
   skills: string[];
   highlights: string[];
 }
@@ -76,6 +94,7 @@ export interface Portfolio {
   conversation?: Array<{ role: string; content: string }>;
   publicSlug: string;
   published: boolean;
+  theme: string;
   publishedAt?: string | null;
   lastGeneratedAt?: string | null;
   student?: Student;
@@ -207,6 +226,7 @@ export const studiosApi = {
 
 export const projectsApi = {
   list: () => api<{ projects: Project[] }>('/api/projects'),
+  explore: () => api<{ projects: (Project & { _count: { sparks: number } })[] }>('/api/projects/explore'),
   get: (id: string) => api<{ project: Project }>(`/api/projects/${id}`),
   listByStudent: (studentId: string) =>
     api<{ projects: Project[] }>(`/api/students/${studentId}/projects`),
@@ -225,6 +245,14 @@ export const projectsApi = {
     }),
   deleteMedia: (projectId: string, mediaId: string) =>
     api<void>(`/api/projects/${projectId}/media/${mediaId}`, { method: 'DELETE' }),
+  spark: (projectId: string) =>
+    api<{ success: boolean; sparked: boolean }>(`/api/projects/${projectId}/spark`, { method: 'POST', body: JSON.stringify({}) }),
+  getCollaborators: (id: string) => 
+    api<{ collaborators: any[] }>(`/api/projects/${id}/collaborators`),
+  addCollaborator: (id: string, studentId: string) => 
+    api<{ collaborator: any }>(`/api/projects/${id}/collaborators`, { method: 'POST', body: JSON.stringify({ studentId }) }),
+  removeCollaborator: (id: string, collaboratorId: string) => 
+    api<void>(`/api/projects/${id}/collaborators/${collaboratorId}`, { method: 'DELETE' }),
 };
 
 export const portfolioApi = {
@@ -241,6 +269,19 @@ export const portfolioApi = {
     api<{ portfolio: Portfolio }>(`/api/students/${studentId}/portfolio/publish`, {
       method: 'PATCH',
       body: JSON.stringify({ published }),
+    }),
+  updateTheme: (studentId: string, theme: string) =>
+    api<{ portfolio: Portfolio }>(`/api/students/${studentId}/portfolio/theme`, {
+      method: 'PATCH',
+      body: JSON.stringify({ theme }),
+    }),
+};
+
+export const aiApi = {
+  scrapYard: (parts: string) =>
+    api<{ ideas: string }>('/api/ai/scrap-yard', {
+      method: 'POST',
+      body: JSON.stringify({ parts }),
     }),
 };
 
@@ -267,7 +308,7 @@ export const mentorApi = {
     api<{ comments: Comment[] }>(`/api/comments?targetType=${targetType}&targetId=${targetId}`),
   createComment: (data: { targetType: string; targetId: string; content: string }) =>
     api<{ comment: Comment }>('/api/comments', { method: 'POST', body: JSON.stringify(data) }),
-  createBadge: (data: { name: string; description: string; icon: string; category: string }) =>
+  createBadge: (data: Partial<Badge>) =>
     api<{ badge: Badge }>('/api/badges', { method: 'POST', body: JSON.stringify(data) }),
 };
 
@@ -277,6 +318,27 @@ export const feesApi = {
     api<{ fee: Fee }>('/api/fees', { method: 'POST', body: JSON.stringify(data) }),
   updateStatus: (id: string, status: 'pending' | 'paid' | 'overdue') =>
     api<{ fee: Fee }>(`/api/fees/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+};
+
+export const tasksApi = {
+  listByProject: (projectId: string) => api<any[]>(`/api/projects/${projectId}/tasks`),
+  create: (projectId: string, data: { title: string; status: string }) =>
+    api<any>(`/api/projects/${projectId}/tasks`, { method: 'POST', body: JSON.stringify(data) }),
+  update: (id: string, data: any) =>
+    api<any>(`/api/tasks/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+  delete: (id: string) => api<{ success: boolean }>(`/api/tasks/${id}`, { method: 'DELETE' }),
+};
+
+export const journalsApi = {
+  listByStudent: (studentId: string, projectId?: string) => {
+    const qs = projectId ? `?projectId=${projectId}` : '';
+    return api<any[]>(`/api/students/${studentId}/journals${qs}`);
+  },
+  create: (studentId: string, data: { title: string; projectId?: string; canvasData?: any }) =>
+    api<any>(`/api/students/${studentId}/journals`, { method: 'POST', body: JSON.stringify(data) }),
+  update: (id: string, data: any) =>
+    api<any>(`/api/journals/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+  delete: (id: string) => api<{ success: boolean }>(`/api/journals/${id}`, { method: 'DELETE' }),
 };
 
 export const uploadApi = {

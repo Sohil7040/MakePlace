@@ -9,6 +9,14 @@ export interface PortfolioProject {
   title: string;
   description: string;
   mediaUrls: string[];
+  story: {
+    problem: string;
+    idea: string;
+    process: string;
+    challenges: string;
+    solution: string;
+    learning: string;
+  };
 }
 
 export interface PortfolioContent {
@@ -106,7 +114,15 @@ The JSON structure must match this schema exactly:
       "id": "String matching the original project tracking ID",
       "title": "Polished, high-impact version of the project title",
       "description": "An engaging project breakdown outlining the engineering problem solved, technologies/hardware stacks utilized, and final outcomes achieved.",
-      "mediaUrls": ["Array of matching string URLs provided in the context data"]
+      "mediaUrls": ["Array of matching string URLs provided in the context data"],
+      "story": {
+        "problem": "What was the problem?",
+        "idea": "The initial idea.",
+        "process": "The build process.",
+        "challenges": "Challenges faced.",
+        "solution": "The final solution.",
+        "learning": "What was learned."
+      }
     }
   ],
   "skills": [
@@ -144,6 +160,7 @@ function enrichPortfolioContent(content: PortfolioContent, projects: ProjectWith
         title: project.title || source?.title || 'Untitled Project',
         description: project.description || source?.description || '',
         mediaUrls: project.mediaUrls?.length ? project.mediaUrls : fallbackMedia,
+        story: project.story || { problem: '', idea: '', process: '', challenges: '', solution: '', learning: '' },
       };
     }),
     skills: content.skills.slice(0, 8),

@@ -36,6 +36,7 @@ export const projectCreateSchema = z.object({
   description: z.string().default(''),
   tags: z.array(z.string()).default([]),
   status: z.enum(['draft', 'published']).default('draft'),
+  phase: z.enum(['idea', 'research', 'design', 'build', 'testing', 'completed']).default('idea'),
 });
 
 export const projectUpdateSchema = projectCreateSchema.partial();
@@ -89,4 +90,8 @@ export const portfolioChatSchema = z.object({
 
 export const portfolioPublishSchema = z.object({
   published: z.boolean(),
+});
+
+export const portfolioThemeSchema = z.object({
+  theme: z.string().min(1),
 });

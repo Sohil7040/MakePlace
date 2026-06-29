@@ -7,6 +7,10 @@ const nextConfig = {
       { protocol: 'http', hostname: 'localhost', port: '3001' },
     ],
   },
+  // Make GEMINI_API_KEY available to server-side API routes
+  env: {
+    GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+  },
 };
 
 module.exports = nextConfig;
