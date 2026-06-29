@@ -6,10 +6,10 @@ import { useAuth } from '@/contexts/auth-context';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function JournalsPage() {
-  const { user } = useAuth();
+  const { user, student } = useAuth();
 
   if (!user) return <DashboardLayout><Skeleton className="h-96" /></DashboardLayout>;
-  if (!user.student?.id) {
+  if (!student?.id) {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center h-[50vh] text-charcoal-400 font-sans">
@@ -29,7 +29,7 @@ export default function JournalsPage() {
           </p>
         </header>
 
-        <DesignJournalsList studentId={user.student.id} />
+        <DesignJournalsList studentId={student.id} />
       </div>
     </DashboardLayout>
   );
